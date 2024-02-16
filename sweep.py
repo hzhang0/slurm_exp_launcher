@@ -30,9 +30,9 @@ class Job:
             self.output_dir = os.path.join(sweep_output_root, args_hash)
             self.train_args['output_dir'] = self.output_dir
 
-        command = ['python -m', script_name] # TODO: modify this for your project setup
-        ## some examples
-        # command = ['python -m', 'module_name.', script_name]
+        command = ['python -m', 'your_module.'+ script_name] # TODO: modify this for your project setup
+        ## some other examples
+        # command = ['python -m', script_name]
         # command = ['python', script_name + '.py']
 
         for k, v in sorted(self.train_args.items()):
@@ -147,11 +147,9 @@ class NumpyEncoder(json.JSONEncoder):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run a sweep')
-    # pass through commands / change here each run
     parser.add_argument('command', choices=['launch', 'delete_incomplete', 'delete_all'])
     parser.add_argument('--experiment', type=str, required=True)
-    parser.add_argument('--command_launcher', type=str, default='multi_gpu')
-    # default fixed
+    parser.add_argument('--command_launcher', type=str, default='slurm')
     parser.add_argument('--output_root', type=str, required = True)
     parser.add_argument('--skip_confirmation', action='store_true')
     parser.add_argument('--no_output_dir', action='store_true')

@@ -20,7 +20,7 @@ This launcher is a heavily modified version of the experiment launcher in the [D
 ### 1. Setting Up
 
 - Copy `experiments.py`, `launchers.py`, and `sweep.py` into your project repository.
-- Go through `train.py`, and add the required components to your own training script.
+- Go through `your_module/train.py`, and add the required components to your own training script.
 - In L33 of `sweep.py`, modify the launch command to match your repository structure.
 
 ### 2. Writing an Experiment in `experiments.py`
@@ -34,12 +34,15 @@ This launcher is a heavily modified version of the experiment launcher in the [D
 Call `sweep.py` with the experiment name (the name of a class in `experiments.py`), a launcher name (in the registry in `launchers.py`), and other appropriate arguments to launch an experiment (a grid of jobs). For example:
 
 ```
-slurm_pre="--mem 50gb -c 8 --gres gpu:1 -t 7-00:00 -p healthyml -q healthyml-main --output {SLURM_LOG_DIR}/%A.log" # sbatch arguments
+EXPERIMENT_NAME="SampleExp1"
+OUTPUT_ROOT="/your/output/root"
+SLURM_PRE="--mem 50gb -c 8 --gres gpu:1 -t 7-00:00 -p healthyml -q healthyml-main --output /data/healthy-ml/scratch/haoran/projects/slurm_exp_launcher/%A.log" # sbatch arguments
+
 python sweep.py launch \
-   --experiment SampleExp1 \
-   --slurm_pre "${slurm_pre}" \
+   --experiment "${EXPERIMENT_NAME}" \
+   --slurm_pre "${SLURM_PRE}" \
    --command_launcher "slurm" \
-   --output_root "YOUR_OUTPUT_DIR/SampleExp1" \
+   --output_root "${OUTPUT_ROOT}/${EXPERIMENT_NAME}" \
    --max_slurm_jobs 20
 ```
 
@@ -47,14 +50,14 @@ Before running this, make sure to activate your conda environment. You may want 
 
 ### 4. Aggregating Results
 
-After some (or all) jobs have finished running, you can load the results that have been saved by your training script, with something like this:
+After all (or some) jobs have finished running, you can load the results that have been saved by your training script, with something like this:
 ```
 import pandas as pd
 from pathlib import Path
 import pickle
 import json
 
-output_root = Path('YOUR_OUTPUT_DIR')
+output_root = Path('YOUR_OUTPUT_DIR') # can optionally subset to EXPERIMENT_NAME
 ress = []
 
 for i in output_root.glob('**/done'):
